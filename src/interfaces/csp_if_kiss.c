@@ -145,6 +145,13 @@ void csp_kiss_rx(csp_iface_t * iface, const uint8_t * buf, size_t len, void * px
 
 						/* Send back into CSP, notice calling from task so last argument must be NULL! */
 						csp_qfifo_write(ifdata->rx_packet, iface, pxTaskWoken);
+
+						/* Free buffer from csp_buffers queue */
+						if (pxTaskWoken == NULL)
+							csp_buffer_free(ifdata->rx_packet);
+						else
+							csp_buffer_free_isr(ifdata->rx_packet);
+
 						ifdata->rx_packet = NULL;
 						ifdata->rx_mode = KISS_MODE_NOT_STARTED;
 						break;
